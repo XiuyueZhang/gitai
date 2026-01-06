@@ -1,0 +1,401 @@
+# GitAI - AI-Powered Git Commit Message Generator
+
+GitAI is a CLI tool that uses local Ollama models to generate intelligent, context-aware Git commit messages following the Conventional Commits format.
+
+## Features
+
+- **Privacy First**: Uses local Ollama models - your code never leaves your machine
+- **Interactive**: Select commit type, scope, and review generated messages
+- **Context-Aware**: Analyzes project structure, recent commits, and README to generate better messages
+- **Configurable**: Customize commit types, scopes, and templates per project
+- **Smart**: Understands git diff and generates meaningful commit messages
+
+## Prerequisites
+
+1. **Go 1.21+** - For building the tool
+2. **Ollama** - For running local AI models
+3. **Git** - Already installed on most systems
+
+### Install Ollama
+
+```bash
+# macOS/Linux
+curl -fsSL https://ollama.com/install.sh | sh
+
+# Start Ollama service
+ollama serve
+```
+
+### Pull an AI Model
+
+```bash
+# Recommended for code (fast and accurate)
+ollama pull qwen2.5-coder:7b
+
+# Alternative models
+ollama pull mistral:7b
+ollama pull codellama:7b
+```
+
+## Installation
+
+### Option 1: Build from Source
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/gitai.git
+cd gitai
+
+# Install dependencies
+go mod download
+
+# Build
+go build -o gitai
+
+# Move to PATH (optional)
+sudo mv gitai /usr/local/bin/
+```
+
+### Option 2: Install with Go
+
+```bash
+go install github.com/yourusername/gitai@latest
+```
+
+## Quick Start
+
+1. **Navigate to your git repository**:
+```bash
+cd your-project
+```
+
+2. **Stage your changes**:
+```bash
+git add .
+```
+
+3. **Run GitAI**:
+```bash
+gitai commit
+```
+
+4. **Follow the interactive prompts**:
+   - Select commit type (feat, fix, docs, etc.)
+   - Enter scope (optional)
+   - Review AI-generated message
+   - Choose to use, regenerate, edit, or cancel
+
+## Usage
+
+### Basic Commands
+
+#### Generate and Commit
+```bash
+gitai commit
+```
+
+#### Generate Only (No Commit)
+```bash
+gitai generate
+```
+
+#### Dry Run
+```bash
+gitai commit --dry-run
+```
+
+### Command Flags
+
+#### Commit Command
+```bash
+gitai commit [flags]
+
+Flags:
+  -d, --dry-run          Show message without committing
+  -t, --type string      Commit type (skip selection)
+  -s, --scope string     Commit scope (skip selection)
+  -l, --language string  Message language (en/zh)
+  -m, --model string     Ollama model to use
+```
+
+#### Examples
+```bash
+# Skip interactive type selection
+gitai commit --type feat --scope api
+
+# Use different model
+gitai commit --model mistral:7b
+
+# Generate Chinese commit message
+gitai commit --language zh
+
+# Just see what would be generated
+gitai commit --dry-run
+```
+
+### Configuration Commands
+
+#### Initialize Config File
+```bash
+gitai config --init
+```
+
+This creates `.gitcommit.yaml` in your current directory.
+
+#### Show Current Config
+```bash
+gitai config --show
+```
+
+## Configuration
+
+GitAI looks for configuration in this order:
+1. `.gitcommit.yaml` (current directory)
+2. `~/.gitcommit.yaml` (home directory)
+3. Default configuration
+
+### Example Configuration
+
+Create `.gitcommit.yaml` in your project root:
+
+```yaml
+# Ollama model to use
+model: "qwen2.5-coder:7b"
+
+# Language for commit messages
+language: "en"
+
+# Commit message template
+template: "{type}{scope}: {emoji} {message}"
+
+# Commit types
+types:
+  - name: "feat"
+    desc: "A new feature"
+    emoji: "✨"
+
+  - name: "fix"
+    desc: "A bug fix"
+    emoji: "🐛"
+
+  - name: "docs"
+    desc: "Documentation changes"
+    emoji: "📝"
+
+# Project-specific scopes
+scopes:
+  - "api"
+  - "ui"
+  - "auth"
+  - "db"
+```
+
+See [.gitcommit.example.yaml](.gitcommit.example.yaml) for a complete example.
+
+## How It Works
+
+1. **Analyzes Context**: Reads git diff, recent commits, README, and project structure
+2. **Builds Smart Prompt**: Creates a detailed prompt with context for the AI model
+3. **Generates Message**: Sends prompt to local Ollama model
+4. **Interactive Review**: Shows generated message and allows editing
+5. **Commits**: Executes `git commit` with the final message
+
+## Supported Models
+
+GitAI works with any Ollama model, but code-specialized models work best:
+
+| Model | Size | Speed | Quality | Recommended |
+|-------|------|-------|---------|-------------|
+| qwen2.5-coder:7b | 4.7GB | Fast | Excellent | ⭐ Yes |
+| codellama:7b | 3.8GB | Fast | Very Good | ⭐ Yes |
+| mistral:7b | 4.1GB | Fast | Good | Yes |
+| deepseek-coder:6.7b | 3.8GB | Fast | Very Good | Yes |
+| llama3:8b | 4.7GB | Medium | Good | OK |
+
+## Conventional Commits
+
+GitAI follows the [Conventional Commits](https://www.conventionalcommits.org/) specification:
+
+```
+<type>(<scope>): <description>
+
+[optional body]
+
+[optional footer]
+```
+
+### Default Types
+
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation changes
+- `style`: Code formatting
+- `refactor`: Code refactoring
+- `perf`: Performance improvements
+- `test`: Adding/updating tests
+- `chore`: Build/tool changes
+- `ci`: CI configuration
+- `build`: Build system changes
+
+## Examples
+
+### Example Output
+
+```
+📝 Git Commit AI Assistant
+
+Changed files (3):
+  ✓ src/api/auth.go (+45, -12)
+  ✓ internal/middleware/jwt.go (+23, -5)
+  ✓ README.md (+10, -0)
+
+? Select commit type:
+  ✨ feat - A new feature
+▸ 🐛 fix - A bug fix
+  📝 docs - Documentation changes
+
+? Select scope: api
+
+🤖 Generating commit message...
+
+Generated message:
+┌─────────────────────────────────────────────┐
+│ fix(api): resolve JWT token expiration bug │
+└─────────────────────────────────────────────┘
+
+? What do you want to do?
+▸ ✅ Use this message
+  🔄 Regenerate
+  ✏️  Edit manually
+  ❌ Cancel
+
+✨ Commit created successfully!
+
+Commit message:
+fix(api): resolve JWT token expiration bug
+
+Files changed:
+  src/api/auth.go
+  internal/middleware/jwt.go
+  README.md
+
+View commit: git show HEAD
+```
+
+## Troubleshooting
+
+### Error: Cannot connect to Ollama
+
+**Solution**: Make sure Ollama is running:
+```bash
+ollama serve
+```
+
+### Error: Model not found
+
+**Solution**: Pull the model first:
+```bash
+ollama pull qwen2.5-coder:7b
+```
+
+### Error: No staged changes found
+
+**Solution**: Stage your changes:
+```bash
+git add <files>
+```
+
+### Error: Not a git repository
+
+**Solution**: Initialize git:
+```bash
+git init
+```
+
+### Slow generation
+
+**Solutions**:
+- Use a smaller model (`mistral:7b` instead of larger models)
+- Reduce `max_diff_length` in config
+- Ensure Ollama has enough RAM allocated
+
+## Development
+
+### Project Structure
+
+```
+gitai/
+├── cmd/              # CLI commands
+│   ├── commit.go     # Commit command
+│   ├── generate.go   # Generate command
+│   └── config.go     # Config command
+├── internal/
+│   ├── ai/           # AI/Ollama integration
+│   ├── git/          # Git operations
+│   ├── config/       # Configuration management
+│   └── ui/           # User interface
+└── main.go
+```
+
+### Running Tests
+
+```bash
+go test ./...
+```
+
+### Building
+
+```bash
+# Build for current platform
+go build -o gitai
+
+# Build for multiple platforms
+GOOS=linux GOARCH=amd64 go build -o gitai-linux-amd64
+GOOS=darwin GOARCH=arm64 go build -o gitai-darwin-arm64
+GOOS=windows GOARCH=amd64 go build -o gitai-windows-amd64.exe
+```
+
+## Contributing
+
+Contributions are welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## License
+
+MIT License - see LICENSE file for details
+
+## Acknowledgments
+
+- [Ollama](https://ollama.com/) - Local AI model runtime
+- [Conventional Commits](https://www.conventionalcommits.org/) - Commit message specification
+- [Cobra](https://github.com/spf13/cobra) - CLI framework
+- [promptui](https://github.com/manifoldco/promptui) - Interactive prompts
+
+## FAQ
+
+**Q: Does this send my code to external servers?**
+A: No! GitAI uses local Ollama models. Your code never leaves your machine.
+
+**Q: Can I use different AI models?**
+A: Yes! Any Ollama-compatible model works. Specify with `--model` flag or in config.
+
+**Q: Does it work with private repositories?**
+A: Yes! Since everything runs locally, there are no privacy concerns.
+
+**Q: Can I customize commit types?**
+A: Yes! Edit `.gitcommit.yaml` to add custom types, emojis, and scopes.
+
+**Q: What if I don't like the generated message?**
+A: You can regenerate, manually edit, or cancel and write your own.
+
+**Q: Does it work on Windows?**
+A: Yes! GitAI works on Windows, macOS, and Linux.
+
+---
+
+**Made with ❤️ for developers who want better commit messages**

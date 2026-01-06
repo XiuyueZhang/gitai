@@ -1,0 +1,78 @@
+# GitAI Configuration File
+# Copy this file to .gitcommit.yaml and customize it for your project
+
+# Ollama model to use for generating commit messages
+# Popular options: qwen2.5-coder:7b, mistral:7b, codellama:7b
+model: "qwen2.5-coder:7b"
+
+# Language for commit messages (en, zh, etc.)
+language: "en"
+
+# Commit message template
+# Available variables: {type}, {scope}, {emoji}, {message}
+template: "{type}{scope}: {emoji} {message}"
+
+# Maximum length of git diff to send to AI (in characters)
+max_diff_length: 2000
+
+# Predefined commit types following Conventional Commits
+types:
+  - name: "feat"
+    desc: "A new feature"
+    emoji: "✨"
+
+  - name: "fix"
+    desc: "A bug fix"
+    emoji: "🐛"
+
+  - name: "docs"
+    desc: "Documentation only changes"
+    emoji: "📝"
+
+  - name: "style"
+    desc: "Code style changes (formatting, missing semicolons, etc)"
+    emoji: "💄"
+
+  - name: "refactor"
+    desc: "Code refactoring (neither fixes a bug nor adds a feature)"
+    emoji: "♻️"
+
+  - name: "perf"
+    desc: "Performance improvements"
+    emoji: "⚡"
+
+  - name: "test"
+    desc: "Adding or updating tests"
+    emoji: "✅"
+
+  - name: "chore"
+    desc: "Build process or auxiliary tool changes"
+    emoji: "🔧"
+
+  - name: "ci"
+    desc: "CI configuration changes"
+    emoji: "👷"
+
+  - name: "build"
+    desc: "Changes that affect the build system or dependencies"
+    emoji: "📦"
+
+# Project-specific scopes (optional)
+# If empty, user will be prompted to enter custom scope
+scopes:
+  - "api"
+  - "ui"
+  - "auth"
+  - "db"
+  - "config"
+  - "docs"
+
+# Custom prompt template (optional)
+# If provided, this will be prepended to the generated prompt
+# Use this to add project-specific context or instructions
+custom_prompt: |
+  This is a [Your Project Type] project.
+  Follow our team's commit message guidelines:
+  - Be concise and clear
+  - Focus on the "why" not the "how"
+  - Use imperative mood (e.g., "add" not "added")

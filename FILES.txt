@@ -1,0 +1,66 @@
+GitAI Project Files
+===================
+
+Source Code (Go)
+----------------
+main.go                                 - Application entry point
+cmd/root.go                            - Root command definition
+cmd/commit.go                          - Commit command (main feature)
+cmd/generate.go                        - Generate-only command
+cmd/config.go                          - Config management command
+
+internal/ai/ollama.go                  - Ollama HTTP client
+internal/ai/prompt.go                  - Smart prompt builder
+
+internal/git/diff.go                   - Git diff operations
+internal/git/commit.go                 - Git commit execution
+internal/git/context.go                - Project context collection
+
+internal/config/config.go              - Configuration management
+internal/config/config_test.go         - Configuration tests
+
+internal/ui/prompt.go                  - Interactive prompts (promptui)
+internal/ui/display.go                 - Formatted terminal output
+
+Documentation
+-------------
+README.md                              - Complete project documentation (8.5 KB)
+QUICKSTART.md                          - 5-minute getting started guide (3.7 KB)
+EXAMPLES.md                            - Real-world usage examples (7+ KB)
+PROJECT_SUMMARY.md                     - Technical project summary (6+ KB)
+LICENSE                                - MIT License
+
+Configuration
+-------------
+.gitcommit.example.yaml                - Example configuration file
+.gitignore                             - Git ignore rules
+go.mod                                 - Go module definition
+go.sum                                 - Dependency lock file
+Makefile                               - Build automation
+
+Build Artifacts (generated)
+---------------------------
+gitai                                  - Compiled binary (macOS/Linux)
+gitai.exe                              - Compiled binary (Windows)
+
+Project Statistics
+------------------
+Total Go Files: 13 files
+Total Lines of Code: ~1,500 lines
+Total Documentation: ~25 KB
+Test Files: 1 file
+Dependencies: 4 external packages
+
+File Sizes
+----------
+Source Code: ~50 KB
+Documentation: ~25 KB
+Binary (built): ~12 MB (with dependencies)
+
+Commands Available
+------------------
+gitai commit       - Interactive commit with AI
+gitai generate     - Generate message without committing
+gitai config       - Configuration management
+gitai --help       - Show help
+gitai --version    - Show version
