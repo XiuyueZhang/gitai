@@ -2,6 +2,7 @@ package ui
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/manifoldco/promptui"
 	"github.com/yourusername/gitai/internal/config"
@@ -158,6 +159,32 @@ func (cs *CommitSelector) Confirm(message string) (bool, error) {
 	}
 
 	return result == "Yes", nil
+}
+
+// PromptTicket asks user to input ticket/issue number
+func (cs *CommitSelector) PromptTicket(prefix string) (string, error) {
+	label := "Enter ticket/issue number"
+	if prefix != "" {
+		label = fmt.Sprintf("Enter ticket number (e.g., %s-123)", prefix)
+	}
+
+	prompt := promptui.Prompt{
+		Label: label,
+		Validate: func(input string) error {
+			input = strings.TrimSpace(input)
+			if input == "" {
+				return fmt.Errorf("ticket number cannot be empty")
+			}
+			return nil
+		},
+	}
+
+	result, err := prompt.Run()
+	if err != nil {
+		return "", err
+	}
+
+	return strings.TrimSpace(result), nil
 }
 
 // Action represents what to do with generated message

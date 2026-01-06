@@ -5,6 +5,11 @@ model: "qwen2.5-coder:7b"
 language: "en"
 detailed_commit: true
 
+# Ticket configuration - REQUIRED for Jira
+require_ticket: true
+ticket_prefix: "PROJ"                    # Change to your Jira project prefix
+ticket_pattern: "[A-Z]+-\\d+"            # Matches PROJ-123, JIRA-456, etc.
+
 custom_prompt: |
   Follow our Jira-integrated commit message guidelines:
 

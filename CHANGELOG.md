@@ -5,6 +5,16 @@ All notable changes to GitAI will be documented in this file.
 ## [Unreleased]
 
 ### Added
+- **Ticket/Issue number integration**: Complete support for Jira, GitHub Issues, and custom ticketing systems
+  - New `--ticket` / `-k` flag for command line
+  - Auto-extraction from branch names (e.g., `feature/PROJ-123-description`)
+  - Interactive prompt when `require_ticket: true`
+  - Smart formatting with `ticket_prefix` (e.g., `123` → `PROJ-123`)
+  - Configurable patterns via `ticket_pattern` regex
+  - Support for multiple formats: JIRA-123, #456, GH-789, custom formats
+  - AI automatically includes ticket number in commit message
+  - Full documentation in `TICKET_INTEGRATION_GUIDE.md`
+
 - **Custom company templates**: Full support for company/team commit standards
   - New `custom_prompt` field in config for company-specific guidelines
   - AI strictly follows your company's commit message requirements

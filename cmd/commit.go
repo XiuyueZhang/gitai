@@ -12,11 +12,12 @@ import (
 )
 
 var (
-	dryRun   bool
-	typeFlag string
-	scopeFlag string
-	langFlag  string
-	modelFlag string
+	dryRun     bool
+	typeFlag   string
+	scopeFlag  string
+	langFlag   string
+	modelFlag  string
+	ticketFlag string
 )
 
 var commitCmd = &cobra.Command{
@@ -34,6 +35,7 @@ func init() {
 	commitCmd.Flags().StringVarP(&scopeFlag, "scope", "s", "", "Commit scope (skip selection)")
 	commitCmd.Flags().StringVarP(&langFlag, "language", "l", "", "Message language (en/zh)")
 	commitCmd.Flags().StringVarP(&modelFlag, "model", "m", "", "Ollama model to use")
+	commitCmd.Flags().StringVarP(&ticketFlag, "ticket", "k", "", "Ticket/issue number (e.g., JIRA-123)")
 }
 
 func runCommit(cmd *cobra.Command, args []string) error {
@@ -101,6 +103,40 @@ func runCommit(cmd *cobra.Command, args []string) error {
 		}
 	}
 
+	// Handle ticket number
+	ticket := ticketFlag
+	if ticket == "" && cfg.RequireTicket {
+		// Try to extract from branch name first
+		ctx, _ := git.GetProjectContext()
+		autoTicket := git.ExtractTicketFromBranch(ctx.BranchName, cfg.TicketPattern)
+
+		if autoTicket != "" {
+			// Found ticket in branch name, ask for confirmation
+			display.ShowInfo(fmt.Sprintf("Found ticket number in branch: %s", autoTicket))
+			useAuto, err := selector.Confirm("Use this ticket number?")
+			if err == nil && useAuto {
+				ticket = autoTicket
+			}
+		}
+
+		// If still no ticket, prompt user
+		if ticket == "" {
+			ticket, err = selector.PromptTicket(cfg.TicketPrefix)
+			if err != nil {
+				return fmt.Errorf("ticket number required but not provided")
+			}
+		}
+	} else if ticket == "" && cfg.TicketPrefix != "" {
+		// Optional ticket with prefix - try to extract from branch
+		ctx, _ := git.GetProjectContext()
+		ticket = git.ExtractTicketFromBranch(ctx.BranchName, cfg.TicketPattern)
+	}
+
+	// Format ticket number if needed
+	if ticket != "" {
+		ticket = git.FormatTicketNumber(ticket, cfg.TicketPrefix)
+	}
+
 	// Get project context
 	display.ShowGenerating()
 	ctx, err := git.GetProjectContext()
@@ -125,6 +161,7 @@ func runCommit(cmd *cobra.Command, args []string) error {
 		Language:       cfg.Language,
 		DetailedCommit: cfg.DetailedCommit,
 		CustomPrompt:   cfg.CustomPrompt,
+		TicketNumber:   ticket,
 	}
 
 	prompt := promptBuilder.Build()

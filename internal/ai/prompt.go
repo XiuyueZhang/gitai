@@ -24,6 +24,7 @@ type PromptBuilder struct {
 	Language       string
 	DetailedCommit bool   // If true, generate multi-line commit with body
 	CustomPrompt   string // Custom company/team commit guidelines
+	TicketNumber   string // Ticket/issue number (e.g., JIRA-123)
 }
 
 // Build constructs the complete prompt for Ollama
@@ -73,6 +74,11 @@ func (pb *PromptBuilder) Build() string {
 
 	if pb.Scope != "" {
 		prompt.WriteString(fmt.Sprintf("Scope: %s\n", pb.Scope))
+	}
+
+	if pb.TicketNumber != "" {
+		prompt.WriteString(fmt.Sprintf("Ticket/Issue Number: %s\n", pb.TicketNumber))
+		prompt.WriteString(fmt.Sprintf("IMPORTANT: Include the ticket number [%s] in the commit message.\n", pb.TicketNumber))
 	}
 
 	language := pb.Language
@@ -129,35 +135,41 @@ func (pb *PromptBuilder) Build() string {
 
 	// Output format
 	prompt.WriteString("OUTPUT FORMAT:\n")
+
+	// Build format string based on ticket presence
+	var formatStr, exampleSubject string
+	if pb.TicketNumber != "" {
+		if pb.Scope != "" {
+			formatStr = fmt.Sprintf("%s(%s): [%s] <subject line>", pb.CommitType, pb.Scope, pb.TicketNumber)
+			exampleSubject = fmt.Sprintf("%s(%s): [%s] add user authentication endpoint", pb.CommitType, pb.Scope, pb.TicketNumber)
+		} else {
+			formatStr = fmt.Sprintf("%s: [%s] <subject line>", pb.CommitType, pb.TicketNumber)
+			exampleSubject = fmt.Sprintf("%s: [%s] add user authentication endpoint", pb.CommitType, pb.TicketNumber)
+		}
+	} else {
+		if pb.Scope != "" {
+			formatStr = fmt.Sprintf("%s(%s): <subject line>", pb.CommitType, pb.Scope)
+			exampleSubject = fmt.Sprintf("%s(%s): add user authentication endpoint", pb.CommitType, pb.Scope)
+		} else {
+			formatStr = fmt.Sprintf("%s: <subject line>", pb.CommitType)
+			exampleSubject = fmt.Sprintf("%s: add user authentication endpoint", pb.CommitType)
+		}
+	}
+
 	if pb.DetailedCommit {
 		// Detailed format with body
-		if pb.Scope != "" {
-			prompt.WriteString(fmt.Sprintf("%s(%s): <subject line>\n\n<body with bullet points>\n\n", pb.CommitType, pb.Scope))
-			prompt.WriteString("Example:\n")
-			prompt.WriteString(fmt.Sprintf("%s(%s): add user authentication endpoint\n\n", pb.CommitType, pb.Scope))
-			prompt.WriteString("- Implement JWT-based authentication\n")
-			prompt.WriteString("- Add login and logout endpoints\n")
-			prompt.WriteString("- Include token validation middleware\n\n")
-		} else {
-			prompt.WriteString(fmt.Sprintf("%s: <subject line>\n\n<body with bullet points>\n\n", pb.CommitType))
-			prompt.WriteString("Example:\n")
-			prompt.WriteString(fmt.Sprintf("%s: add user authentication endpoint\n\n", pb.CommitType))
-			prompt.WriteString("- Implement JWT-based authentication\n")
-			prompt.WriteString("- Add login and logout endpoints\n")
-			prompt.WriteString("- Include token validation middleware\n\n")
-		}
+		prompt.WriteString(formatStr + "\n\n<body with bullet points>\n\n")
+		prompt.WriteString("Example:\n")
+		prompt.WriteString(exampleSubject + "\n\n")
+		prompt.WriteString("- Implement JWT-based authentication\n")
+		prompt.WriteString("- Add login and logout endpoints\n")
+		prompt.WriteString("- Include token validation middleware\n\n")
 		prompt.WriteString("Generate the commit message now (subject + body with details):\n")
 	} else {
 		// Concise format - subject only
-		if pb.Scope != "" {
-			prompt.WriteString(fmt.Sprintf("%s(%s): <message>\n\n", pb.CommitType, pb.Scope))
-			prompt.WriteString("Example:\n")
-			prompt.WriteString(fmt.Sprintf("%s(%s): add user authentication endpoint\n\n", pb.CommitType, pb.Scope))
-		} else {
-			prompt.WriteString(fmt.Sprintf("%s: <message>\n\n", pb.CommitType))
-			prompt.WriteString("Example:\n")
-			prompt.WriteString(fmt.Sprintf("%s: add user authentication endpoint\n\n", pb.CommitType))
-		}
+		prompt.WriteString(formatStr + "\n\n")
+		prompt.WriteString("Example:\n")
+		prompt.WriteString(exampleSubject + "\n\n")
 		prompt.WriteString("Generate the commit message now (ONLY the subject line):\n")
 	}
 

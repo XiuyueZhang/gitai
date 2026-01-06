@@ -20,6 +20,23 @@ max_diff_length: 2000
 # If false: generates concise single-line commits (subject only)
 detailed_commit: true
 
+# Ticket/Issue number configuration
+# Enable if your team requires ticket numbers in commits (e.g., Jira, GitHub issues)
+require_ticket: false                  # Set to true to make ticket number mandatory
+ticket_prefix: ""                      # Default prefix (e.g., "JIRA", "PROJ", "GH")
+ticket_pattern: ""                     # Regex pattern to extract from branch (e.g., "[A-Z]+-\\d+")
+
+# Examples:
+# For Jira integration:
+#   require_ticket: true
+#   ticket_prefix: "PROJ"
+#   ticket_pattern: "[A-Z]+-\\d+"     # Matches PROJ-123, JIRA-456
+#
+# For GitHub issues:
+#   require_ticket: true
+#   ticket_prefix: "GH"
+#   ticket_pattern: "#\\d+|GH-\\d+"   # Matches #123 or GH-123
+
 # Predefined commit types following Conventional Commits
 types:
   - name: "feat"
