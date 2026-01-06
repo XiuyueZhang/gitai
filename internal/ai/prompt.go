@@ -25,6 +25,7 @@ type PromptBuilder struct {
 	DetailedCommit bool   // If true, generate multi-line commit with body
 	CustomPrompt   string // Custom company/team commit guidelines
 	TicketNumber   string // Ticket/issue number (e.g., JIRA-123)
+	SubjectLength  string // Subject length: "short" (36 chars) or "normal" (72 chars)
 }
 
 // Build constructs the complete prompt for Ollama
@@ -116,7 +117,13 @@ func (pb *PromptBuilder) Build() string {
 	// Requirements - different based on detailed mode
 	prompt.WriteString("REQUIREMENTS:\n")
 	prompt.WriteString("1. Follow Conventional Commits format\n")
-	prompt.WriteString("2. Subject line: concise summary (max 72 characters)\n")
+
+	// Set subject length based on configuration
+	maxLength := 72
+	if pb.SubjectLength == "short" {
+		maxLength = 36
+	}
+	prompt.WriteString(fmt.Sprintf("2. Subject line: concise summary (max %d characters)\n", maxLength))
 
 	if pb.DetailedCommit {
 		// Detailed mode: include body with explanations

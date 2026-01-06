@@ -12,12 +12,13 @@ import (
 )
 
 var (
-	dryRun     bool
-	typeFlag   string
-	scopeFlag  string
-	langFlag   string
-	modelFlag  string
-	ticketFlag string
+	dryRun       bool
+	typeFlag     string
+	scopeFlag    string
+	langFlag     string
+	modelFlag    string
+	ticketFlag   string
+	subjectLenFlag string
 )
 
 var commitCmd = &cobra.Command{
@@ -36,6 +37,7 @@ func init() {
 	commitCmd.Flags().StringVarP(&langFlag, "language", "l", "", "Message language (en/zh)")
 	commitCmd.Flags().StringVarP(&modelFlag, "model", "m", "", "Ollama model to use")
 	commitCmd.Flags().StringVarP(&ticketFlag, "ticket", "k", "", "Ticket/issue number (e.g., JIRA-123)")
+	commitCmd.Flags().StringVarP(&subjectLenFlag, "subject-length", "n", "", "Subject length (short/normal)")
 }
 
 func runCommit(cmd *cobra.Command, args []string) error {
@@ -65,6 +67,9 @@ func runCommit(cmd *cobra.Command, args []string) error {
 	}
 	if langFlag != "" {
 		cfg.Language = langFlag
+	}
+	if subjectLenFlag != "" {
+		cfg.SubjectLength = subjectLenFlag
 	}
 
 	// Get staged changes
@@ -162,6 +167,7 @@ func runCommit(cmd *cobra.Command, args []string) error {
 		DetailedCommit: cfg.DetailedCommit,
 		CustomPrompt:   cfg.CustomPrompt,
 		TicketNumber:   ticket,
+		SubjectLength:  cfg.SubjectLength,
 	}
 
 	prompt := promptBuilder.Build()

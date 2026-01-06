@@ -20,6 +20,11 @@ max_diff_length: 2000
 # If false: generates concise single-line commits (subject only)
 detailed_commit: true
 
+# Subject line length (short or normal)
+# short: max 36 characters - for very concise commit messages
+# normal: max 72 characters - standard conventional commits length (default)
+subject_length: "normal"
+
 # Ticket/Issue number configuration
 # Enable if your team requires ticket numbers in commits (e.g., Jira, GitHub issues)
 require_ticket: false                  # Set to true to make ticket number mandatory

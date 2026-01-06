@@ -21,6 +21,7 @@ type Config struct {
 	RequireTicket  bool         `yaml:"require_ticket,omitempty"`  // Require ticket/issue number
 	TicketPattern  string       `yaml:"ticket_pattern,omitempty"`  // Pattern for ticket numbers (e.g., "PROJ-\d+")
 	TicketPrefix   string       `yaml:"ticket_prefix,omitempty"`   // Default ticket prefix (e.g., "JIRA", "PROJ")
+	SubjectLength  string       `yaml:"subject_length,omitempty"`  // Subject length: "short" (36 chars) or "normal" (72 chars)
 }
 
 // CommitType defines a type of commit with description and emoji
@@ -83,6 +84,9 @@ func loadFromFile(path string) (*Config, error) {
 	if config.MaxDiffLength == 0 {
 		config.MaxDiffLength = 2000
 	}
+	if config.SubjectLength == "" {
+		config.SubjectLength = "normal"
+	}
 
 	return config, nil
 }
@@ -107,7 +111,8 @@ func DefaultConfig() *Config {
 		Template:       "{type}{scope}: {emoji} {message}",
 		Scopes:         []string{},
 		MaxDiffLength:  2000,
-		DetailedCommit: true, // Default to detailed commits
+		DetailedCommit: true,      // Default to detailed commits
+		SubjectLength:  "normal",  // Default to normal length (72 chars)
 	}
 }
 
