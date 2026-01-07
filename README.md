@@ -18,11 +18,32 @@ GitAI is a CLI tool that uses local Ollama models to generate intelligent, conte
 
 ### Install Ollama
 
+**macOS:**
 ```bash
-# Linux only
-curl -fsSL https://ollama.com/install.sh | sh
+# Option 1: Using Homebrew (Recommended)
+brew install ollama
 
-# Start Ollama service
+# Option 2: Download from website
+# Visit https://ollama.com/download and download the macOS app
+```
+
+**Linux:**
+```bash
+curl -fsSL https://ollama.com/install.sh | sh
+```
+
+**Windows:**
+```bash
+# Download installer from https://ollama.com/download
+```
+
+**Start Ollama:**
+```bash
+# macOS: Ollama runs automatically after installation
+# You can also start it manually:
+ollama serve
+
+# Linux: Start Ollama service
 ollama serve
 ```
 
