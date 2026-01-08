@@ -77,12 +77,13 @@ get_latest_version() {
 
 # Download binary
 download_binary() {
-    DOWNLOAD_URL="https://github.com/$REPO/releases/download/$VERSION/${BINARY_NAME}-${PLATFORM}"
+    DOWNLOAD_FILENAME="${BINARY_NAME}-${PLATFORM}"
+    DOWNLOAD_URL="https://github.com/$REPO/releases/download/$VERSION/${DOWNLOAD_FILENAME}"
     CHECKSUM_URL="${DOWNLOAD_URL}.sha256"
 
     TMP_DIR=$(mktemp -d)
-    TMP_FILE="$TMP_DIR/$BINARY_NAME"
-    TMP_CHECKSUM="$TMP_DIR/$BINARY_NAME.sha256"
+    TMP_FILE="$TMP_DIR/$DOWNLOAD_FILENAME"
+    TMP_CHECKSUM="$TMP_DIR/${DOWNLOAD_FILENAME}.sha256"
 
     print_info "Downloading from: $DOWNLOAD_URL"
 
@@ -97,13 +98,13 @@ download_binary() {
         print_info "Verifying checksum..."
         cd "$TMP_DIR"
         if command -v sha256sum >/dev/null 2>&1; then
-            sha256sum -c "$BINARY_NAME.sha256" >/dev/null 2>&1 || {
+            sha256sum -c "${DOWNLOAD_FILENAME}.sha256" >/dev/null 2>&1 || {
                 print_error "Checksum verification failed"
                 rm -rf "$TMP_DIR"
                 exit 1
             }
         elif command -v shasum >/dev/null 2>&1; then
-            shasum -a 256 -c "$BINARY_NAME.sha256" >/dev/null 2>&1 || {
+            shasum -a 256 -c "${DOWNLOAD_FILENAME}.sha256" >/dev/null 2>&1 || {
                 print_error "Checksum verification failed"
                 rm -rf "$TMP_DIR"
                 exit 1

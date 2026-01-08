@@ -57,11 +57,12 @@ function Get-LatestVersion {
 function Download-Binary {
     param($Version, $Arch)
 
-    $downloadUrl = "https://github.com/$REPO/releases/download/$Version/gitai-windows-$Arch.exe"
+    $downloadFilename = "gitai-windows-$Arch.exe"
+    $downloadUrl = "https://github.com/$REPO/releases/download/$Version/$downloadFilename"
     $checksumUrl = "$downloadUrl.sha256"
 
     $tempDir = [System.IO.Path]::GetTempPath()
-    $tempFile = Join-Path $tempDir $BINARY_NAME
+    $tempFile = Join-Path $tempDir $downloadFilename
     $tempChecksum = "$tempFile.sha256"
 
     Write-Info "Downloading from: $downloadUrl"
@@ -79,11 +80,14 @@ function Download-Binary {
         Invoke-WebRequest -Uri $checksumUrl -OutFile $tempChecksum -UseBasicParsing
         Write-Info "Verifying checksum..."
 
-        $expectedHash = (Get-Content $tempChecksum -Raw).Split(' ')[0]
+        $checksumContent = Get-Content $tempChecksum -Raw
+        $expectedHash = ($checksumContent -split '\s+')[0]
         $actualHash = (Get-FileHash $tempFile -Algorithm SHA256).Hash
 
         if ($expectedHash.ToLower() -ne $actualHash.ToLower()) {
             Write-Error-Custom "Checksum verification failed"
+            Write-Error-Custom "Expected: $expectedHash"
+            Write-Error-Custom "Got: $actualHash"
             Remove-Item $tempFile, $tempChecksum -Force
             exit 1
         }
