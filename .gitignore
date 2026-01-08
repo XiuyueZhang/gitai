@@ -29,3 +29,7 @@ Thumbs.db
 # Local config (don't commit user configs)
 .gitcommit.yaml
 .gitcommit.yml
+
+# Build outputs
+dist/
+*.sha256

@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/manifoldco/promptui"
-	"github.com/yourusername/gitai/internal/config"
+	"github.com/xyue92/gitai/internal/config"
 )
 
 // CommitSelector provides interactive selection for commit parameters

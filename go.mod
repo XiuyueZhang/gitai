@@ -1,4 +1,4 @@
-module github.com/yourusername/gitai
+module github.com/xyue92/gitai
 
 go 1.21
 

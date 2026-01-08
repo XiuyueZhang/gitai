@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
-	"github.com/yourusername/gitai/internal/git"
+	"github.com/xyue92/gitai/internal/git"
 )
 
 // Display provides formatted output functions

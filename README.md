@@ -12,9 +12,9 @@ GitAI is a CLI tool that uses local Ollama models to generate intelligent, conte
 
 ## Prerequisites
 
-1. **Go 1.21+** - For building the tool
-2. **Ollama** - For running local AI models
-3. **Git** - Already installed on most systems
+1. **Ollama** - For running local AI models (required)
+2. **Git** - Already installed on most systems (required)
+3. **Go 1.21+** - Only needed if building from source (optional)
 
 ### Install Ollama
 
@@ -60,11 +60,73 @@ ollama pull codellama:7b
 
 ## Installation
 
-### Option 1: Build from Source
+### Quick Install (Recommended)
+
+**macOS and Linux:**
+```bash
+curl -sSL https://raw.githubusercontent.com/xyue92/gitai/main/scripts/install.sh | bash
+```
+
+**Windows (PowerShell):**
+```powershell
+iwr -useb https://raw.githubusercontent.com/xyue92/gitai/main/scripts/install.ps1 | iex
+```
+
+### Homebrew (macOS/Linux)
+
+```bash
+# Add the tap (first time only)
+brew tap xyue92/tap
+
+# Install
+brew install gitai
+
+# Update
+brew upgrade gitai
+```
+
+### Manual Installation
+
+Download the pre-built binary for your platform from [GitHub Releases](https://github.com/xyue92/gitai/releases/latest):
+
+**macOS:**
+```bash
+# For Apple Silicon (M1/M2/M3)
+wget https://github.com/xyue92/gitai/releases/latest/download/gitai-darwin-arm64
+chmod +x gitai-darwin-arm64
+sudo mv gitai-darwin-arm64 /usr/local/bin/gitai
+
+# For Intel
+wget https://github.com/xyue92/gitai/releases/latest/download/gitai-darwin-amd64
+chmod +x gitai-darwin-amd64
+sudo mv gitai-darwin-amd64 /usr/local/bin/gitai
+```
+
+**Linux:**
+```bash
+# For AMD64
+wget https://github.com/xyue92/gitai/releases/latest/download/gitai-linux-amd64
+chmod +x gitai-linux-amd64
+sudo mv gitai-linux-amd64 /usr/local/bin/gitai
+
+# For ARM64
+wget https://github.com/xyue92/gitai/releases/latest/download/gitai-linux-arm64
+chmod +x gitai-linux-arm64
+sudo mv gitai-linux-arm64 /usr/local/bin/gitai
+```
+
+**Windows:**
+1. Download [gitai-windows-amd64.exe](https://github.com/xyue92/gitai/releases/latest/download/gitai-windows-amd64.exe)
+2. Rename to `gitai.exe`
+3. Move to a directory in your PATH (e.g., `C:\Program Files\GitAI\`)
+
+### Build from Source
+
+If you prefer to build from source or want to contribute:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/gitai.git
+git clone https://github.com/xyue92/gitai.git
 cd gitai
 
 # Install dependencies
@@ -77,10 +139,10 @@ go build -o gitai
 sudo mv gitai /usr/local/bin/
 ```
 
-### Option 2: Install with Go
+### Install with Go
 
 ```bash
-go install github.com/yourusername/gitai@latest
+go install github.com/xyue92/gitai@latest
 ```
 
 ## Quick Start

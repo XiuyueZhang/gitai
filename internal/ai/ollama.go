@@ -102,24 +102,7 @@ func (c *OllamaClient) Generate(prompt string) (string, error) {
 	return ollamaResp.Response, nil
 }
 
-// checkConnection checks if Ollama server is reachable
-func (c *OllamaClient) checkConnection() error {
-	url := c.BaseURL + "/api/tags"
-	resp, err := c.Client.Get(url)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("ollama returned status code: %d", resp.StatusCode)
-	}
-
-	return nil
-}
-
-// GenerateStream sends a prompt to Ollama and streams the generated text
-// onChunk is called for each chunk of text received
+// GenerateStream sends a prompt to Ollama and streams the response in real-time
 func (c *OllamaClient) GenerateStream(prompt string, onChunk func(chunk string)) (string, error) {
 	// Check if Ollama is running
 	if err := c.checkConnection(); err != nil {
@@ -189,6 +172,22 @@ func (c *OllamaClient) GenerateStream(prompt string, onChunk func(chunk string))
 	}
 
 	return fullResponse, nil
+}
+
+// checkConnection checks if Ollama server is reachable
+func (c *OllamaClient) checkConnection() error {
+	url := c.BaseURL + "/api/tags"
+	resp, err := c.Client.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("ollama returned status code: %d", resp.StatusCode)
+	}
+
+	return nil
 }
 
 // contains checks if a string contains a substring

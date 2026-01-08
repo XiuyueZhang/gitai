@@ -6,10 +6,10 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
-	"github.com/yourusername/gitai/internal/ai"
-	"github.com/yourusername/gitai/internal/config"
-	"github.com/yourusername/gitai/internal/git"
-	"github.com/yourusername/gitai/internal/ui"
+	"github.com/xyue92/gitai/internal/ai"
+	"github.com/xyue92/gitai/internal/config"
+	"github.com/xyue92/gitai/internal/git"
+	"github.com/xyue92/gitai/internal/ui"
 )
 
 var (

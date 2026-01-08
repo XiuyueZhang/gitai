@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/yourusername/gitai/internal/config"
+	"github.com/xyue92/gitai/internal/config"
 )
 
 var (
