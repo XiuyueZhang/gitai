@@ -265,6 +265,9 @@ func runCommit(cmd *cobra.Command, args []string) error {
 			goto commit
 		case ui.ActionRegenerate:
 			display.ShowGenerating()
+			// Increment regenerate count and rebuild prompt for variation
+			promptBuilder.RegenerateCount++
+			prompt = promptBuilder.Build()
 			continue
 		case ui.ActionEdit:
 			// Handle edit mode with post-edit options
@@ -291,9 +294,32 @@ func runCommit(cmd *cobra.Command, args []string) error {
 					goto commit
 				case ui.ActionRegenerateFromEdit:
 					// Use the edited message as a prompt to regenerate
-					display.ShowGenerating()
-					promptBuilder.CustomPrompt = fmt.Sprintf("Generate a commit message based on this user input: %s\n\nAlso consider the following diff:", editedMessage)
+					promptBuilder.CustomPrompt = fmt.Sprintf(`USER'S COMMIT MESSAGE DRAFT:
+The user has provided the following commit message draft (which may be in mixed languages or incomplete).
+Your task is to understand their intent and generate a proper commit message based on it.
+
+User's draft:
+%s
+
+INSTRUCTIONS:
+1. Understand what the user is trying to communicate (even if it's in Chinese or mixed languages)
+2. Generate a professional commit message that captures the user's intent
+3. Keep the commit type (%s) unless the user clearly intended a different type
+4. Follow the Conventional Commits format
+5. Use the target language specified in the configuration
+
+If the user wrote:
+- "fix: 修复登录bug" → understand they mean "fix login bug" → output proper message in target language
+- "feat: add new 功能" → understand they mean "add new feature" → output proper message in target language
+- Mixed language content → understand the meaning → output clean message in target language`, editedMessage, commitType)
+
+					// Debug: Print before building prompt
+					display.ShowInfo(fmt.Sprintf("[DEBUG] Custom Prompt Set: %d chars", len(promptBuilder.CustomPrompt)))
+					display.ShowInfo(fmt.Sprintf("[DEBUG] User's draft: %s", editedMessage))
+
 					prompt = promptBuilder.Build()
+
+					display.ShowGenerating()
 					// Break out of edit loop and regenerate
 					goto regenerate
 				case ui.ActionEdit:
@@ -309,7 +335,7 @@ func runCommit(cmd *cobra.Command, args []string) error {
 
 	regenerate:
 		// Continue the outer loop to regenerate
-		display.ShowGenerating()
+		// Note: display.ShowGenerating() is already called in each action branch
 	}
 
 	return fmt.Errorf("max retries reached")

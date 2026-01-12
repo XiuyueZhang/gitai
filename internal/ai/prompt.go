@@ -17,15 +17,16 @@ type ProjectContext struct {
 
 // PromptBuilder constructs prompts for AI commit message generation
 type PromptBuilder struct {
-	CommitType     string
-	Scope          string
-	Diff           string
-	Context        ProjectContext
-	Language       string
-	DetailedCommit bool   // If true, generate multi-line commit with body
-	CustomPrompt   string // Custom company/team commit guidelines
-	TicketNumber   string // Ticket/issue number (e.g., JIRA-123)
-	SubjectLength  string // Subject length: "short" (36 chars) or "normal" (72 chars)
+	CommitType       string
+	Scope            string
+	Diff             string
+	Context          ProjectContext
+	Language         string
+	DetailedCommit   bool   // If true, generate multi-line commit with body
+	CustomPrompt     string // Custom company/team commit guidelines
+	TicketNumber     string // Ticket/issue number (e.g., JIRA-123)
+	SubjectLength    string // Subject length: "short" (36 chars) or "normal" (72 chars)
+	RegenerateCount  int    // Number of times regenerated (adds variation hints)
 }
 
 // Build constructs the complete prompt for Ollama
@@ -178,6 +179,19 @@ func (pb *PromptBuilder) Build() string {
 		prompt.WriteString("Example:\n")
 		prompt.WriteString(exampleSubject + "\n\n")
 		prompt.WriteString("Generate the commit message now (ONLY the subject line):\n")
+	}
+
+	// Add variation hint if this is a regeneration
+	if pb.RegenerateCount > 0 {
+		variationHints := []string{
+			"Try a different perspective or emphasis in the subject line.",
+			"Consider alternative wording or focus on different aspects.",
+			"Rephrase with a fresh approach while maintaining accuracy.",
+			"Use different verbs or structure to convey the same changes.",
+			"Focus on a different aspect of the changes for variety.",
+		}
+		hintIndex := pb.RegenerateCount % len(variationHints)
+		prompt.WriteString(fmt.Sprintf("\nNOTE: This is regeneration attempt #%d. %s\n", pb.RegenerateCount, variationHints[hintIndex]))
 	}
 
 	return prompt.String()
