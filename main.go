@@ -8,5 +8,7 @@ import (
 var Version = "dev"
 
 func main() {
+	// Set version in cmd package
+	cmd.SetVersion(Version)
 	cmd.Execute()
 }

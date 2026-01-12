@@ -81,7 +81,7 @@ brew tap xyue92/tap
 # Install
 brew install gitai
 
-# Update
+# Update via Homebrew
 brew upgrade gitai
 ```
 
@@ -168,6 +168,42 @@ gitai commit
    - Review AI-generated message
    - Choose to use, regenerate, edit, or cancel
 
+## Updating
+
+### Self-Update (Recommended)
+
+GitAI includes a built-in self-update command that works regardless of how you installed it:
+
+```bash
+# Update to the latest version
+gitai update
+
+# Check for updates without installing
+gitai update --check
+
+# Force update even if already on latest version
+gitai update --force
+```
+
+The update command will:
+- Check GitHub releases for the latest version
+- Download the appropriate binary for your platform
+- Verify the binary using SHA256 checksums
+- Replace your current binary with the new version
+
+### Alternative Update Methods
+
+**Via Homebrew:**
+```bash
+brew upgrade gitai
+```
+
+**Via Install Script:**
+```bash
+# Re-run the install script
+curl -sSL https://raw.githubusercontent.com/xyue92/gitai/main/scripts/install.sh | bash
+```
+
 ## Usage
 
 ### Basic Commands
@@ -185,6 +221,11 @@ gitai generate
 #### Dry Run
 ```bash
 gitai commit --dry-run
+```
+
+#### Update GitAI
+```bash
+gitai update
 ```
 
 ### Command Flags
