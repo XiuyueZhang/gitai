@@ -10,21 +10,31 @@ import (
 
 // Config holds the application configuration
 type Config struct {
-	Model              string       `yaml:"model"`
-	Language           string       `yaml:"language"`
-	Languages          []string     `yaml:"languages,omitempty"`           // Multiple languages for multilingual commits
-	AutoDetectLanguage bool         `yaml:"auto_detect_language,omitempty"` // Auto-detect language from project
-	Types              []CommitType `yaml:"types"`
-	Template           string       `yaml:"template"`
-	Scopes             []string     `yaml:"scopes"`
-	CustomPrompt       string       `yaml:"custom_prompt,omitempty"`
-	MaxDiffLength      int          `yaml:"max_diff_length,omitempty"`
-	DetailedCommit     bool         `yaml:"detailed_commit,omitempty"` // Generate detailed commit messages with body
-	PromptScope        bool         `yaml:"prompt_scope,omitempty"`    // Whether to prompt for scope (default: false)
-	RequireTicket      bool         `yaml:"require_ticket,omitempty"`  // Require ticket/issue number
-	TicketPattern      string       `yaml:"ticket_pattern,omitempty"`  // Pattern for ticket numbers (e.g., "PROJ-\d+")
-	TicketPrefix       string       `yaml:"ticket_prefix,omitempty"`   // Default ticket prefix (e.g., "JIRA", "PROJ")
-	SubjectLength      string       `yaml:"subject_length,omitempty"`  // Subject length: "short" (36 chars) or "normal" (72 chars)
+	Model              string           `yaml:"model"`
+	Language           string           `yaml:"language"`
+	Languages          []string         `yaml:"languages,omitempty"`           // Multiple languages for multilingual commits
+	AutoDetectLanguage bool             `yaml:"auto_detect_language,omitempty"` // Auto-detect language from project
+	Types              []CommitType     `yaml:"types"`
+	Template           string           `yaml:"template"`
+	Scopes             []string         `yaml:"scopes"`
+	CustomPrompt       string           `yaml:"custom_prompt,omitempty"`
+	MaxDiffLength      int              `yaml:"max_diff_length,omitempty"`
+	DetailedCommit     bool             `yaml:"detailed_commit,omitempty"` // Generate detailed commit messages with body
+	PromptScope        bool             `yaml:"prompt_scope,omitempty"`    // Whether to prompt for scope (default: false)
+	RequireTicket      bool             `yaml:"require_ticket,omitempty"`  // Require ticket/issue number
+	TicketPattern      string           `yaml:"ticket_pattern,omitempty"`  // Pattern for ticket numbers (e.g., "PROJ-\d+")
+	TicketPrefix       string           `yaml:"ticket_prefix,omitempty"`   // Default ticket prefix (e.g., "JIRA", "PROJ")
+	SubjectLength      string           `yaml:"subject_length,omitempty"`  // Subject length: "short" (36 chars) or "normal" (72 chars)
+	DiffAnalysis       DiffAnalysisConfig `yaml:"diff_analysis,omitempty"` // Intelligent diff analysis configuration
+}
+
+// DiffAnalysisConfig configures intelligent diff analysis
+type DiffAnalysisConfig struct {
+	Enabled             bool `yaml:"enabled"`               // Enable smart diff analysis (default: true)
+	IncludeFunctionNames bool `yaml:"include_function_names"` // Extract function/class names (default: true)
+	IncludeImports      bool `yaml:"include_imports"`       // Extract import changes (default: true)
+	SmartTruncate       bool `yaml:"smart_truncate"`        // Use intelligent truncation (default: true)
+	ContextLines        int  `yaml:"context_lines"`         // Number of context lines in diff chunks (default: 3)
 }
 
 // CommitType defines a type of commit with description and emoji
@@ -91,6 +101,18 @@ func loadFromFile(path string) (*Config, error) {
 		config.SubjectLength = "normal"
 	}
 
+	// Apply defaults for diff analysis
+	if config.DiffAnalysis.Enabled || (!config.DiffAnalysis.Enabled && config.DiffAnalysis.ContextLines == 0) {
+		// If not explicitly configured, use defaults
+		if config.DiffAnalysis.ContextLines == 0 {
+			config.DiffAnalysis.Enabled = true
+			config.DiffAnalysis.IncludeFunctionNames = true
+			config.DiffAnalysis.IncludeImports = true
+			config.DiffAnalysis.SmartTruncate = true
+			config.DiffAnalysis.ContextLines = 3
+		}
+	}
+
 	return config, nil
 }
 
@@ -114,8 +136,15 @@ func DefaultConfig() *Config {
 		Template:       "{type}{scope}: {emoji} {message}",
 		Scopes:         []string{},
 		MaxDiffLength:  2000,
-		DetailedCommit: true,      // Default to detailed commits
-		SubjectLength:  "normal",  // Default to normal length (72 chars)
+		DetailedCommit: true,     // Default to detailed commits
+		SubjectLength:  "normal", // Default to normal length (72 chars)
+		DiffAnalysis: DiffAnalysisConfig{
+			Enabled:             true,
+			IncludeFunctionNames: true,
+			IncludeImports:      true,
+			SmartTruncate:       true,
+			ContextLines:        3,
+		},
 	}
 }
 

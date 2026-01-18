@@ -15,6 +15,18 @@ type ProjectContext struct {
 	ChangedFiles  []string
 	ReadmeSnippet string
 	DiffStats     string
+	DiffAnalysis  *DiffAnalysisInfo // Enhanced diff analysis (optional)
+}
+
+// DiffAnalysisInfo contains simplified diff analysis for prompts
+type DiffAnalysisInfo struct {
+	FileSummaries    []string // Human-readable file summaries
+	KeyChanges       []string // Important code changes
+	ImportChanges    []string // Import/dependency changes
+	ChangeComplexity string   // simple, moderate, complex
+	TotalFiles       int
+	TotalAdditions   int
+	TotalDeletions   int
 }
 
 // PromptBuilder constructs prompts for AI commit message generation
@@ -127,8 +139,45 @@ func (pb *PromptBuilder) Build() string {
 		prompt.WriteString("\n\n")
 	}
 
+	// Enhanced diff analysis (if available)
+	if pb.Context.DiffAnalysis != nil {
+		analysis := pb.Context.DiffAnalysis
+
+		prompt.WriteString("DETAILED ANALYSIS:\n")
+		prompt.WriteString(fmt.Sprintf("Complexity: %s | Files: %d | +%d/-%d lines\n\n",
+			analysis.ChangeComplexity, analysis.TotalFiles,
+			analysis.TotalAdditions, analysis.TotalDeletions))
+
+		// File-level summaries
+		if len(analysis.FileSummaries) > 0 {
+			prompt.WriteString("File changes:\n")
+			for _, summary := range analysis.FileSummaries {
+				prompt.WriteString(fmt.Sprintf("  %s\n", summary))
+			}
+			prompt.WriteString("\n")
+		}
+
+		// Key code changes
+		if len(analysis.KeyChanges) > 0 {
+			prompt.WriteString("Key code changes:\n")
+			for _, change := range analysis.KeyChanges {
+				prompt.WriteString(fmt.Sprintf("  - %s\n", change))
+			}
+			prompt.WriteString("\n")
+		}
+
+		// Import/dependency changes
+		if len(analysis.ImportChanges) > 0 {
+			prompt.WriteString("Import/dependency changes:\n")
+			for _, imp := range analysis.ImportChanges {
+				prompt.WriteString(fmt.Sprintf("  - %s\n", imp))
+			}
+			prompt.WriteString("\n")
+		}
+	}
+
 	// Actual diff (truncated if too long)
-	prompt.WriteString("CHANGES:\n")
+	prompt.WriteString("CHANGES (detailed diff):\n")
 	diff := pb.Diff
 	// Limit diff to ~2000 characters to avoid token limits
 	if len(diff) > 2000 {

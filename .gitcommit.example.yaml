@@ -34,6 +34,24 @@ template: "{type}{scope}: {emoji} {message}"
 # Maximum length of git diff to send to AI (in characters)
 max_diff_length: 2000
 
+# Intelligent Diff Analysis (NEW!)
+# ================================
+# Enhanced diff analysis for more accurate commit messages
+diff_analysis:
+  enabled: true                    # Enable smart diff analysis (default: true)
+  include_function_names: true     # Extract function/class names (default: true)
+  include_imports: true            # Extract import/dependency changes (default: true)
+  smart_truncate: true             # Use intelligent truncation (default: true)
+  context_lines: 3                 # Number of context lines in diff chunks (default: 3)
+
+# How it works:
+# - Analyzes each file individually (status, additions, deletions)
+# - Extracts key code changes (function names, class definitions)
+# - Detects import/dependency changes
+# - Intelligently truncates large diffs while preserving important information
+# - Provides file-level summaries and complexity analysis
+# - Helps AI generate more accurate commit messages even for large changes
+
 # Generate detailed commit messages with body (recommended: true)
 # If true: generates multi-line commits with subject + body explaining changes
 # If false: generates concise single-line commits (subject only)
