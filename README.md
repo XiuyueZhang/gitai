@@ -7,8 +7,12 @@ GitAI is a CLI tool that uses local Ollama models to generate intelligent, conte
 - **Privacy First**: Uses local Ollama models - your code never leaves your machine
 - **Interactive**: Select commit type, scope, and review generated messages
 - **Context-Aware**: Analyzes project structure, recent commits, and README to generate better messages
+- **Intelligent Diff Analysis**: Smart analysis of code changes with function/class extraction and complexity evaluation
+- **Multilingual**: Support for 10 languages with auto-detection (en, zh, ja, ko, de, fr, es, pt, ru, it)
+- **Commit Statistics**: Comprehensive analysis of commit history with visual insights and recommendations
 - **Configurable**: Customize commit types, scopes, and templates per project
 - **Smart**: Understands git diff and generates meaningful commit messages
+- **Self-Updating**: Built-in update command to keep GitAI up to date
 
 ## Prerequisites
 
@@ -233,6 +237,18 @@ gitai commit --dry-run
 gitai update
 ```
 
+#### View Commit Statistics
+```bash
+# Show stats for last 100 commits (default)
+gitai stats
+
+# Analyze more commits
+gitai stats --limit 500
+
+# Export to JSON
+gitai stats --export stats.json
+```
+
 ### Command Flags
 
 #### Commit Command
@@ -260,6 +276,15 @@ gitai commit --language zh
 
 # Just see what would be generated
 gitai commit --dry-run
+```
+
+#### Stats Command
+```bash
+gitai stats [flags]
+
+Flags:
+  -n, --limit int       Number of commits to analyze (default 100)
+  -e, --export string   Export statistics to JSON file
 ```
 
 ### Configuration Commands
@@ -497,6 +522,15 @@ Contributions are welcome! Please:
 ## License
 
 MIT License - see LICENSE file for details
+
+## Documentation
+
+📚 **Comprehensive Guides:**
+- [Intelligent Diff Analysis Guide](INTELLIGENT_DIFF_GUIDE.md) - Deep dive into smart diff analysis
+- [Multilingual Support Guide](MULTILINGUAL_GUIDE.md) - Using GitAI in multiple languages
+- [Commit Statistics Guide](docs/STATS_GUIDE.md) - Analyzing commit patterns and quality
+- [Multilingual Quick Start](docs/QUICKSTART_MULTILINGUAL.md) - Get started with multilingual commits
+- [Multilingual Features](MULTILINGUAL_FEATURES.md) - Technical implementation details
 
 ## Acknowledgments
 
