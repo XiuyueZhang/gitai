@@ -195,12 +195,22 @@ func (hm *HookManager) getHookTemplate(hookType string) string {
 // getPrepareCommitMsgTemplate returns prepare-commit-msg hook template
 func (hm *HookManager) getPrepareCommitMsgTemplate() string {
 	return `#!/bin/sh
-# GitAI - Auto-generated Git Hook
-# This hook automatically generates commit messages using GitAI
+# GitAI - Auto-generated Git Hook (Hybrid Mode)
+#
+# This hook provides two modes:
+# 1. git commit       → Quick auto-generation (for simple commits)
+# 2. gitai commit     → Full interactive mode (for complex commits with ticket/scope)
+#
+# Use GITAI_HOOK=0 to disable: GITAI_HOOK=0 git commit
 
 COMMIT_MSG_FILE=$1
 COMMIT_SOURCE=$2
 SHA1=$3
+
+# Allow disabling hook with environment variable
+if [ "$GITAI_HOOK" = "0" ] || [ "$GITAI_HOOK" = "false" ]; then
+    exit 0
+fi
 
 # Skip if committing with -m, --amend, merge, or squash
 if [ "$COMMIT_SOURCE" = "message" ] || [ "$COMMIT_SOURCE" = "merge" ] || [ "$COMMIT_SOURCE" = "squash" ]; then
@@ -223,19 +233,22 @@ if ! command -v gitai >/dev/null 2>&1; then
 fi
 
 # Check if there are staged changes
-if ! git diff --cached --quiet 2>/dev/null; then
-    # Generate commit message with GitAI
-    echo "🤖 Generating commit message with GitAI..." >&2
+if git diff --cached --quiet 2>/dev/null; then
+    exit 0
+fi
 
-    # Run gitai generate and capture output
-    if GENERATED_MSG=$(gitai generate --quiet 2>&1); then
-        # Write generated message to commit message file
-        echo "$GENERATED_MSG" > "$COMMIT_MSG_FILE"
-        echo "✅ Commit message generated. Edit if needed." >&2
-    else
-        echo "⚠️  GitAI generation failed. Write message manually." >&2
-        echo "   Error: $GENERATED_MSG" >&2
-    fi
+# Automatic mode: quick generation
+echo "🤖 Generating commit message with GitAI..." >&2
+echo "💡 Tip: Use 'gitai commit' for interactive mode (type/scope/ticket selection)" >&2
+
+# Run gitai generate and capture output
+if GENERATED_MSG=$(gitai generate --quiet 2>&1); then
+    # Write generated message to commit message file
+    echo "$GENERATED_MSG" > "$COMMIT_MSG_FILE"
+    echo "✅ Message generated. Edit in your editor, or Ctrl+C to cancel and use 'gitai commit'" >&2
+else
+    echo "⚠️  GitAI generation failed. Write message manually or use 'gitai commit'" >&2
+    echo "   Error: $GENERATED_MSG" >&2
 fi
 
 exit 0
